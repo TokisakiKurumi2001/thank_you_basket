@@ -2,12 +2,19 @@
 #include "DFRobotDFPlayerMini.h"
 
 #define BUTTON 13
+
 int prevBtnState = 0;
 int btnState = 0;
 
+int song_list[] = {3, 5, 6, 7, 8, 9, 10, 11};
+int len = sizeof(song_list) / sizeof(int);
+
+int index = 0;
+int flag = 1;
+int count = 0;
+
 SoftwareSerial mySoftwareSerial(10, 11); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
-int flag = 1;
 
 void setup()
 {
@@ -37,16 +44,24 @@ void loop()
   btnState = digitalRead(BUTTON);
   if (btnState == 1 && btnState != prevBtnState) {
     // open the basket
-    Serial.println("Is pressed");
-    myDFPlayer.play(3); // Please give me trash
+    myDFPlayer.play(4); // Please give me trash
     delay(2000);
     flag *= -1;
   }
   if (btnState == 0 && flag < 0) {
-    Serial.println("Is not pressed");
-    myDFPlayer.play(2);
-    delay(1500);
+    myDFPlayer.play(1); // Thank you
+    delay(2000);
     flag *= -1;
+    count++;
+  }
+  if (count == 3)
+  {
+    index = random(0, len);
+    myDFPlayer.play(song_list[index]); // Any song
+    if (btnState == 1) {
+      myDFPlayer.pause();  // stop playing music
+    }
+    count = 0; // reset
   }
   prevBtnState = btnState;
 }
